@@ -9,6 +9,23 @@ before_install:
 - chmod 600 /tmp/id_rsa
 - ssh-add /tmp/id_rsa
 
+matrix:
+  include:
+    - language: python
+      python: 3.6
+      script:
+        - echo script_step
+      env:
+        - APP_ID=python_app
+
+    - language: node_js
+      node_js:
+        - "node"
+      script:
+        - echo script_step
+      env:
+        - APP_ID=node_app
+
 script:
 - echo "Script step"
 
@@ -17,7 +34,13 @@ after_success:
 
 deploy:
 - provider: script
-  script: ssh $DEPLOY_HOST_USERNAME@$DEPLOY_HOST -p $DEPLOY_HOST_PORT 'echo test > ssh_test.txt'
+  script: ssh $DEPLOY_HOST_USERNAME@$DEPLOY_HOST -p $DEPLOY_HOST_PORT 'echo test > ssh_python_test.txt'
+  on:
+    condition: $APP_ID = python_app
+- provider: script
+  script: ssh $DEPLOY_HOST_USERNAME@$DEPLOY_HOST -p $DEPLOY_HOST_PORT 'echo test > ssh_node_test.txt'
+  on:
+    condition: $APP_ID = node_app
 
 env:
   global:
